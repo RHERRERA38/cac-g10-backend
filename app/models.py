@@ -44,3 +44,51 @@ class Reserva:
         cursor.close()
         #devuelve Resultados
         return reservas
+    
+    def save(self):
+        #Guarda o actualiza las reservas.
+        db = get_db()
+        cursor = db.cursor()
+        if self.Id_reserva:
+            query = "UPDATE tbl_reservas SET nombre=%s, email=%s, nro_telefono=%s, cant_comensales=%s, fecha=%s, hora=%s, local_Id=%s, preferencias=%s, confirmacion=%s WHERE id_reserva = %s"
+            cursor.execute(query, (self.nombre, self.email, self.nro_telefono, self.cant_comensales, self.fecha, self.hora, self.local, self.preferencias, self.confirmacion, self.Id_reserva))
+        else:
+            query = "INSERT INTO tbl_reservas (nombre, email, nro_telefono, cant_comensales, fecha, hora, local_Id, preferencias, confirmacion) VALUES (%s, %s, %s, %s,%s, %s, %s, %s, %s)"
+            cursor.execute(query, (self.nombre, self.email, self.nro_telefono, self.cant_comensales, self.fecha, self.hora, self.local, self.preferencias, self.confirmacion))
+        #Obtener el ultimo Id generado
+        self.Id_reserva = cursor.lastrowid
+        db.commit() #Confirmación de las sentencias
+        cursor.close()
+        
+    @staticmethod
+    def get_by_id(Id_reserva):
+        #Metodo para seleccionar una reserva
+        db = get_db()
+        cursor = db.cursor()
+        query = "SELECT * FROM tbl_reservas WHERE Id_reserva = %s"
+        cursor.execute(query, (Id_reserva,))
+        row = cursor.fetchone()
+        cursor.close()
+        if row:
+            return Reserva(Id_reserva=row[0], nombre=row[1], email=row[2], nro_telefono=row[3], cant_comensales=row[4], fecha=row[5], hora=row[6], local=row[7], preferencias=row[8], confirmacion=row[9])
+        return None
+        
+    @staticmethod
+    def confirm(Id_reserva):
+        #Metodo para confirmar las reservas
+        db = get_db()
+        cursor = db.cursor()
+        query = "UPDATE tbl_reservas SET confirmacion = 1 WHERE Id_reserva = %s"
+        cursor.execute(query, (Id_reserva,))
+        db.commit()
+        cursor.close()
+        
+    def delete(self):
+        #Metodo para eliminar una reserva
+        db = get_db()
+        cursor = db.cursor()
+        query = "DELETE FROM tbl_reservas WHERE Id_reserva = %s"
+        cursor.execute(query, (self.Id_reserva,))
+        db.commit()
+        cursor.close()
+        
