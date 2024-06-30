@@ -1,9 +1,13 @@
 from flask import Flask
 from app.views import get_all_reservas, create_reserva, get_reserva, update_reserva, confirm_reserva, delete_reserva
 from app.database import init_app
+from flask_cors import CORS
 
 #Iniciar la aplicacion con Flask
 app = Flask(__name__)
+
+#permitir solicitudes de cualquier origen
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 init_app(app)
 
